@@ -1,0 +1,192 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "PDEE91DDB90597936"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ns",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "builderOptions": {
+            "columns": [
+              {
+                "name": "timestamp"
+              },
+              {
+                "name": "duration"
+              }
+            ],
+            "database": "analytics",
+            "limit": 1000,
+            "meta": {},
+            "mode": "list",
+            "orderBy": [
+              {
+                "dir": "ASC",
+                "name": "timestamp"
+              }
+            ],
+            "queryType": "table",
+            "table": "request_time"
+          },
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "PDEE91DDB90597936"
+          },
+          "editorType": "builder",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "aggregates": [],
+              "columns": [
+                {
+                  "custom": false,
+                  "name": "timestamp",
+                  "type": "DateTime"
+                },
+                {
+                  "custom": false,
+                  "name": "duration",
+                  "type": "Int64"
+                }
+              ],
+              "database": "analytics",
+              "filters": [],
+              "groupBy": [],
+              "limit": 1000,
+              "meta": {},
+              "mode": "list",
+              "orderBy": [
+                {
+                  "dir": "ASC",
+                  "name": "timestamp"
+                }
+              ],
+              "queryType": "table",
+              "table": "request_time"
+            }
+          },
+          "pluginVersion": "4.0.0-beta",
+          "queryType": "table",
+          "rawSql": "SELECT \"timestamp\", \"duration\" FROM \"analytics\".\"request_time\" ORDER BY timestamp ASC LIMIT 1000",
+          "refId": "A"
+        }
+      ],
+      "title": "Duration Changes",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2024-01-14T08:03:15.616Z",
+    "to": "2024-02-15T08:03:15.616Z"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Duration",
+  "uid": "e8ab406e-791a-4558-9193-c818394fbcf1",
+  "version": 3,
+  "weekStart": ""
+}
