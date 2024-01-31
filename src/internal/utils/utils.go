@@ -16,3 +16,16 @@ func NewLogger() Logger {
 		Info:  log.New(os.Stdout, "INFO: ", log.LstdFlags),
 	}
 }
+
+func Iterate[Item any](a []Item) func() *Item {
+	i := 0
+	max := len(a)
+	return func() *Item {
+		if i >= max {
+			return nil
+		}
+		defer func() { i += 1 }()
+		item := a[i]
+		return &item
+	}
+}

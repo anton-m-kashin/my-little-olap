@@ -3,38 +3,27 @@ package db
 import (
 	"context"
 	"my-little-olap/internal/core"
+	"my-little-olap/internal/utils"
 	"time"
 )
 
 func (ch *ClickhouseDB) AddScreenOpeningTimeMetrics(
 	metrics []core.ScreenOpeningTimeMetric,
 ) {
-	batch, err := ch.conn.PrepareBatch(
-		context.Background(),
-		`INSERT INTO screen_opening_time VALUES (?, ?, ?, ?, ?)`,
+	err := insert[core.ScreenOpeningTimeMetric](
+		ch,
+		"screen_opening_time",
+		metrics,
+		func(m core.ScreenOpeningTimeMetric) []any {
+			return []any{
+				m.SessionID,
+				m.Platform,
+				m.Timestamp,
+				m.Duration,
+				m.ScreenName,
+			}
+		},
 	)
-	if err != nil {
-		ch.logger.Error.Fatalf(
-			"Screen opening time metrics insertion error: %s\n",
-			err,
-		)
-	}
-	for _, m := range metrics {
-		err := batch.Append(
-			m.SessionID,
-			m.Platform,
-			m.Timestamp,
-			m.Duration,
-			m.ScreenName,
-		)
-		if err != nil {
-			ch.logger.Error.Fatalf(
-				"Screen opening time batch creation error: %s\n",
-				err,
-			)
-		}
-	}
-	err = batch.Send()
 	if err != nil {
 		ch.logger.Error.Fatalf(
 			"Screen opening time batch sending error: %s\n",
@@ -46,32 +35,20 @@ func (ch *ClickhouseDB) AddScreenOpeningTimeMetrics(
 func (ch *ClickhouseDB) AddRequestTimeMetrics(
 	metrics []core.RequestTimeMetric,
 ) {
-	batch, err := ch.conn.PrepareBatch(
-		context.Background(),
-		`INSERT INTO request_time VALUES (?, ?, ?, ?, ?)`,
+	err := insert[core.RequestTimeMetric](
+		ch,
+		"screen_opening_time",
+		metrics,
+		func(m core.RequestTimeMetric) []any {
+			return []any{
+				m.SessionID,
+				m.Platform,
+				m.Timestamp,
+				m.Duration,
+				m.RequestURL,
+			}
+		},
 	)
-	if err != nil {
-		ch.logger.Error.Fatalf(
-			"Request time metrics insertion error: %s\n",
-			err,
-		)
-	}
-	for _, m := range metrics {
-		err := batch.Append(
-			m.SessionID,
-			m.Platform,
-			m.Timestamp,
-			m.Duration,
-			m.RequestURL,
-		)
-		if err != nil {
-			ch.logger.Error.Fatalf(
-				"Request time batch creation error: %s\n",
-				err,
-			)
-		}
-	}
-	err = batch.Send()
 	if err != nil {
 		ch.logger.Error.Fatalf(
 			"Screen opening time batch sending error: %s\n",
@@ -155,3 +132,23 @@ func (ch *ClickhouseDB) GetLastAddRequestTimeMetrics(
 }
 
 var _ = (*core.MetricsRepository)(nil)
+
+func insert[Item any](
+	ch *ClickhouseDB,
+	table string,
+	items []Item,
+	transform func(Item) []any,
+) error {
+	nextItem := utils.Iterate(items)
+	return ch.insertBatch(
+		table,
+		func() *[]any {
+			item := nextItem()
+			if item == nil {
+				return nil
+			}
+			fields := transform(*item)
+			return &fields
+		},
+	)
+}

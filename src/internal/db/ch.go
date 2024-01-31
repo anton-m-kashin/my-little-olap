@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"strings"
 
 	"my-little-olap/internal/utils"
 
@@ -87,4 +88,50 @@ func openCH(c *Config) (driver.Conn, error) {
 		err = conn.Ping(context.Background())
 	}
 	return conn, err
+}
+
+func (ch *ClickhouseDB) insertBatch(
+	table string,
+	nextRow func() *[]any,
+) error {
+	ctx := context.Background()
+
+	row := nextRow()
+	firstRowLen := len(*row)
+	phs := make([]string, firstRowLen)
+	for i := 0; i < firstRowLen; i++ {
+		phs[i] = "?"
+	}
+	query := fmt.Sprintf(
+		"INSERT INTO %s VALUES (%s)",
+		table,
+		strings.Join(phs, ","),
+	)
+
+	batch, err := ch.conn.PrepareBatch(ctx, query)
+	if err != nil {
+		return err
+	}
+
+	for row != nil {
+		rLen := len(*row)
+		if rLen != firstRowLen {
+			ch.logger.Error.Printf(
+				"Row length: %d mismatches with first row length: %d\n",
+				rLen,
+				firstRowLen,
+			)
+		}
+		err := batch.Append(*row...)
+		if err != nil {
+			ch.logger.Error.Printf(
+				"Error adding to batch in: %s: %s\n",
+				table,
+				err,
+			)
+		}
+		row = nextRow()
+	}
+
+	return batch.Send()
 }
