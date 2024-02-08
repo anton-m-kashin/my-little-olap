@@ -29,9 +29,9 @@ func (s *OLAPServer) Run() error {
 
 func (s *OLAPServer) newMux() *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/upload", s.uploadMetrics)
-	mux.HandleFunc("/last_screen_time", s.lastScreenOpenTimeMetrics)
-	mux.HandleFunc("/last_request_time", s.lastRequestTimeMetrics)
+	mux.HandleFunc("POST /upload", s.uploadMetrics)
+	mux.HandleFunc("GET /last_screen_time", s.lastScreenOpenTimeMetrics)
+	mux.HandleFunc("GET /last_request_time", s.lastRequestTimeMetrics)
 	return mux
 }
 

@@ -1,10 +1,9 @@
 module my-little-olap
 
-go 1.21.3
+go 1.22.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.17.1
-	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.17.0
 )
 
